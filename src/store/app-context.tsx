@@ -8,6 +8,8 @@ interface AppContextType extends AppState {
   todayBriefing: Briefing;
   getPushCandidates: () => AlertEvent[];
   pickPushEvent: () => AlertEvent | null;
+  isCategoryActive: (cat: SubscriptionCategory) => boolean;
+  getCategoryThreshold: (cat: SubscriptionCategory) => number;
   updateAlertStatus: (id: string, status: AlertStatus) => void;
   updateAlertMeta: (id: string, meta: { location?: string; department?: string }) => void;
   addMaterial: (alertId: string, material: Omit<MaterialItem, 'id' | 'createdAt'>) => void;
@@ -289,10 +291,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return sub?.threshold ?? 60;
   };
 
+  const isCategoryActive = (cat: SubscriptionCategory): boolean => {
+    return subscriptions.some(s => s.category === cat && s.isActive);
+  };
+
   const getPushCandidates = useCallback((): AlertEvent[] => {
     return alerts.filter(a => {
       if (a.status === 'resolved') return false;
       if (pushedIds.has(a.id)) return false;
+      if (!isCategoryActive(a.category)) return false;
       const threshold = getCategoryThreshold(a.category);
       const negScore = a.negativeRatio;
       const discScore = Math.min(100, Math.floor(a.discussionCount / 300));
@@ -412,6 +419,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       todayBriefing,
       getPushCandidates,
       pickPushEvent,
+      isCategoryActive,
+      getCategoryThreshold,
       updateAlertStatus,
       updateAlertMeta,
       addMaterial,

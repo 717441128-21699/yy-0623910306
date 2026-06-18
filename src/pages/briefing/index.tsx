@@ -19,14 +19,18 @@ const targetMeta: Record<BriefingTarget, { name: string; icon: string }> = {
   pr: { name: '公关', icon: '📢' }
 };
 
+const EMPTY_SEND: BriefingSendStatus = { legal: false, brand: false, pr: false };
+const ALL_SEND: BriefingSendStatus = { legal: true, brand: true, pr: true };
+
 const BriefingPage: React.FC = () => {
   const { todayBriefing, briefings, sendBriefingToTarget, sendBriefingAll } = useAppContext();
   const historyBriefings = useMemo(() => briefings.slice(1), [briefings]);
   const allTargets: BriefingTarget[] = ['legal', 'brand', 'pr'];
-  const allDone = allTargets.every(t => todayBriefing.sendStatus[t]);
+  const todaySend = todayBriefing.sendStatus ?? EMPTY_SEND;
+  const allDone = allTargets.every(t => todaySend[t]);
 
   const handleSendSingle = (target: BriefingTarget) => {
-    if (todayBriefing.sendStatus[target]) {
+    if (todaySend[target]) {
       Taro.showToast({ title: `${targetMeta[target].name}已发送`, icon: 'none' });
       return;
     }
@@ -55,7 +59,7 @@ const BriefingPage: React.FC = () => {
         <View className={styles.todayHeader}>
           <Text className={styles.todayLabel}>今日简报 · 自动生成于 {todayBriefing.generatedAt.slice(11, 16)}</Text>
           <View className={styles.todayStatus}>
-            <Text>{allDone ? '已全部发送' : `${allTargets.filter(t => todayBriefing.sendStatus[t]).length}/3 已发送`}</Text>
+            <Text>{allDone ? '已全部发送' : `${allTargets.filter(t => todaySend[t]).length}/3 已发送`}</Text>
           </View>
         </View>
         <Text className={styles.todayTitle}>{todayBriefing.title}</Text>
@@ -95,7 +99,7 @@ const BriefingPage: React.FC = () => {
         <View className={styles.targetRow}>
           {allTargets.map(t => {
             const meta = targetMeta[t];
-            const done = todayBriefing.sendStatus[t];
+            const done = todaySend[t];
             return (
               <View key={t} className={classnames(styles.targetItem, done && styles.targetDone)}>
                 <View className={styles.targetIcon}>
@@ -121,10 +125,10 @@ const BriefingPage: React.FC = () => {
         {allTargets.map(t => (
           <Button
             key={t}
-            className={classnames(styles.singleSendBtn, todayBriefing.sendStatus[t] && styles.singleDone)}
+            className={classnames(styles.singleSendBtn, todaySend[t] && styles.singleDone)}
             onClick={() => handleSendSingle(t)}
           >
-            {todayBriefing.sendStatus[t] ? `✓ ${targetMeta[t].name}已发` : `发给${targetMeta[t].name}`}
+            {todaySend[t] ? `✓ ${targetMeta[t].name}已发` : `发给${targetMeta[t].name}`}
           </Button>
         ))}
         <Button
@@ -140,7 +144,8 @@ const BriefingPage: React.FC = () => {
 
 const HistoryCard: React.FC<{ briefing: Briefing }> = ({ briefing }) => {
   const allTargets: BriefingTarget[] = ['legal', 'brand', 'pr'];
-  const doneCount = allTargets.filter(t => briefing.sendStatus?.[t]).length;
+  const send = briefing.sendStatus ?? (briefing.isSent ? ALL_SEND : EMPTY_SEND);
+  const doneCount = allTargets.filter(t => send[t]).length;
   return (
     <View className={styles.historyCard}>
       <View className={styles.historyHeader}>

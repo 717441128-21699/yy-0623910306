@@ -66,7 +66,7 @@ export interface Briefing {
   events: AlertEvent[];
   generatedAt: string;
   isSent: boolean;
-  sendStatus: BriefingSendStatus;
+  sendStatus?: BriefingSendStatus;
 }
 
 export interface AppState {
