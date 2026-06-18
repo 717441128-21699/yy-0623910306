@@ -30,10 +30,17 @@ const statusList: { key: AlertStatus; label: string }[] = [
   { key: 'resolved', label: '已处理' }
 ];
 
+const commonLocations = ['全国', '北京市', '上海市', '深圳市', '广州市', '杭州市', '成都市', '江苏省', '广东省', '浙江省'];
+const commonDepartments = ['公共事务部', '法务部', '品牌公关部', '运营部', '项目部', '人力资源部', '合规部', '市场部'];
+
 const EventDetailPage: React.FC = () => {
   const router = useRouter();
   const { alerts, updateAlertStatus, updateAlertMeta, addMaterial } = useAppContext();
   const [showMaterialModal, setShowMaterialModal] = useState(false);
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
+  const [showDeptPicker, setShowDeptPicker] = useState(false);
+  const [customLocation, setCustomLocation] = useState('');
+  const [customDept, setCustomDept] = useState('');
   const [newMaterial, setNewMaterial] = useState<{ type: MaterialType; title: string; source: string; content: string }>({
     type: 'comment',
     title: '',
@@ -84,6 +91,38 @@ const EventDetailPage: React.FC = () => {
 
   const goToMaterials = () => {
     Taro.navigateTo({ url: '/pages/materials/index' });
+  };
+
+  const handleSelectLocation = (loc: string) => {
+    updateAlertMeta(alert.id, { location: loc });
+    setShowLocationPicker(false);
+    Taro.showToast({ title: '属地已更新', icon: 'success' });
+    console.log('[EventDetail] location updated', { id: alert.id, location: loc });
+  };
+
+  const handleCustomLocation = () => {
+    if (!customLocation.trim()) {
+      Taro.showToast({ title: '请输入属地', icon: 'none' });
+      return;
+    }
+    handleSelectLocation(customLocation.trim());
+    setCustomLocation('');
+  };
+
+  const handleSelectDept = (dept: string) => {
+    updateAlertMeta(alert.id, { department: dept });
+    setShowDeptPicker(false);
+    Taro.showToast({ title: '责任部门已更新', icon: 'success' });
+    console.log('[EventDetail] department updated', { id: alert.id, department: dept });
+  };
+
+  const handleCustomDept = () => {
+    if (!customDept.trim()) {
+      Taro.showToast({ title: '请输入部门名称', icon: 'none' });
+      return;
+    }
+    handleSelectDept(customDept.trim());
+    setCustomDept('');
   };
 
   return (
@@ -148,13 +187,23 @@ const EventDetailPage: React.FC = () => {
         <View className={styles.sectionCard}>
           <View className={styles.sectionTitle}>属地与责任部门</View>
           <View className={styles.metaRow}>
-            <View className={styles.metaItem}>
+            <View className={styles.metaItem} onClick={() => setShowLocationPicker(true)}>
               <Text className={styles.metaLabel}>属地</Text>
-              <Text className={styles.metaValue}>{alert.location || '待标记'}</Text>
+              <View className={styles.metaValue}>
+                <Text className={alert.location ? '' : styles.metaPlaceholder}>
+                  {alert.location || '点击标记属地'}
+                </Text>
+                <Text className={styles.metaArrow}>›</Text>
+              </View>
             </View>
-            <View className={styles.metaItem}>
+            <View className={styles.metaItem} onClick={() => setShowDeptPicker(true)}>
               <Text className={styles.metaLabel}>责任部门</Text>
-              <Text className={styles.metaValue}>{alert.department || '待分配'}</Text>
+              <View className={styles.metaValue}>
+                <Text className={alert.department ? '' : styles.metaPlaceholder}>
+                  {alert.department || '点击分配部门'}
+                </Text>
+                <Text className={styles.metaArrow}>›</Text>
+              </View>
             </View>
           </View>
         </View>
@@ -209,6 +258,68 @@ const EventDetailPage: React.FC = () => {
         <Button className={styles.secondaryBtn} onClick={handleReport}>上报</Button>
         <Button className={styles.primaryBtn} onClick={handleResolve}>标记已处理</Button>
       </View>
+
+      {showLocationPicker && (
+        <View className={styles.modalMask} onClick={() => setShowLocationPicker(false)}>
+          <View className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <View className={styles.modalHeader}>
+              <Text className={styles.modalTitle}>选择属地</Text>
+              <Text className={styles.modalClose} onClick={() => setShowLocationPicker(false)}>×</Text>
+            </View>
+            <View className={styles.pickerOptions}>
+              {commonLocations.map(loc => (
+                <View
+                  key={loc}
+                  className={classnames(styles.pickerOption, alert.location === loc && styles.pickerActive)}
+                  onClick={() => handleSelectLocation(loc)}
+                >
+                  <Text>{loc}</Text>
+                </View>
+              ))}
+            </View>
+            <View className={styles.customInputRow}>
+              <Input
+                className={styles.customInput}
+                placeholder="或输入其他属地"
+                value={customLocation}
+                onInput={(e) => setCustomLocation(e.detail.value)}
+              />
+              <Button className={styles.confirmBtn} onClick={handleCustomLocation}>确定</Button>
+            </View>
+          </View>
+        </View>
+      )}
+
+      {showDeptPicker && (
+        <View className={styles.modalMask} onClick={() => setShowDeptPicker(false)}>
+          <View className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <View className={styles.modalHeader}>
+              <Text className={styles.modalTitle}>分配责任部门</Text>
+              <Text className={styles.modalClose} onClick={() => setShowDeptPicker(false)}>×</Text>
+            </View>
+            <View className={styles.pickerOptions}>
+              {commonDepartments.map(dept => (
+                <View
+                  key={dept}
+                  className={classnames(styles.pickerOption, alert.department === dept && styles.pickerActive)}
+                  onClick={() => handleSelectDept(dept)}
+                >
+                  <Text>{dept}</Text>
+                </View>
+              ))}
+            </View>
+            <View className={styles.customInputRow}>
+              <Input
+                className={styles.customInput}
+                placeholder="或输入其他部门"
+                value={customDept}
+                onInput={(e) => setCustomDept(e.detail.value)}
+              />
+              <Button className={styles.confirmBtn} onClick={handleCustomDept}>确定</Button>
+            </View>
+          </View>
+        </View>
+      )}
 
       {showMaterialModal && (
         <View className={styles.modalMask} onClick={() => setShowMaterialModal(false)}>

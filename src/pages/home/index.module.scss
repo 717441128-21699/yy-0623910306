@@ -199,3 +199,150 @@
   color: $color-text-primary;
   font-weight: $font-weight-medium;
 }
+
+.pushNotify {
+  position: fixed;
+  top: 0;
+  left: 16rpx;
+  right: 16rpx;
+  z-index: 999;
+  transform: translateY(-140%);
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pushShow {
+  transform: translateY(24rpx);
+}
+
+.pushCard {
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 24rpx;
+  padding: 24rpx 28rpx;
+  box-shadow: 0 16rpx 48rpx rgba(0, 0, 0, 0.3);
+  color: $color-text-white;
+}
+
+.pushHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+
+.pushAppName {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+}
+
+.pushIcon {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 8rpx;
+  background: linear-gradient(135deg, #1E3A8A, #2563EB);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22rpx;
+  font-weight: $font-weight-bold;
+}
+
+.pushTime {
+  font-size: 22rpx;
+  opacity: 0.6;
+}
+
+.pushLevel {
+  display: inline-flex;
+  align-items: center;
+  height: 36rpx;
+  padding: 0 14rpx;
+  border-radius: 8rpx;
+  font-size: 22rpx;
+  font-weight: $font-weight-semibold;
+  margin-bottom: 12rpx;
+}
+
+.pushLevelDanger {
+  background: rgba(220, 38, 38, 0.9);
+  color: #fff;
+}
+
+.pushLevelWarning {
+  background: rgba(245, 158, 11, 0.9);
+  color: #fff;
+}
+
+.pushTitle {
+  font-size: 30rpx;
+  font-weight: $font-weight-semibold;
+  line-height: 1.4;
+  margin-bottom: 12rpx;
+}
+
+.pushTrigger {
+  font-size: 24rpx;
+  opacity: 0.75;
+  line-height: 1.5;
+  margin-bottom: 20rpx;
+}
+
+.pushFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pushSuggestion {
+  display: inline-flex;
+  align-items: center;
+  height: 48rpx;
+  padding: 0 20rpx;
+  border-radius: 24rpx;
+  font-size: 24rpx;
+  font-weight: $font-weight-semibold;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.pushAction {
+  display: inline-flex;
+  align-items: center;
+  gap: 6rpx;
+  font-size: 26rpx;
+  color: #93C5FD;
+  font-weight: $font-weight-medium;
+}
+
+.pushDismiss {
+  position: absolute;
+  top: 20rpx;
+  right: 24rpx;
+  width: 44rpx;
+  height: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  opacity: 0.5;
+}
+
+.simulateBtn {
+  @include button-reset;
+  display: inline-flex;
+  align-items: center;
+  height: 52rpx;
+  padding: 0 20rpx;
+  border-radius: 26rpx;
+  background: rgba(255, 255, 255, 0.15);
+  color: $color-text-white;
+  font-size: 22rpx;
+  font-weight: $font-weight-medium;
+  gap: 8rpx;
+
+  &:active {
+    opacity: 0.8;
+  }
+}

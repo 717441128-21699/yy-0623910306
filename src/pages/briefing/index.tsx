@@ -1,17 +1,21 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, ScrollView, Button } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import classnames from 'classnames';
 import { useAppContext } from '@/store/app-context';
 import SectionHeader from '@/components/SectionHeader';
-import { Briefing } from '@/types';
+import { Briefing, AlertLevel } from '@/types';
 import styles from './index.module.scss';
 
-const BriefingPage: React.FC = () => {
-  const { briefings, sendBriefing } = useAppContext();
+const levelClassMap: Record<AlertLevel, string> = {
+  danger: 'dotDanger',
+  warning: 'dotWarning',
+  info: 'dotInfo'
+};
 
-  const todayBriefing = briefings[0];
-  const historyBriefings = briefings.slice(1);
+const BriefingPage: React.FC = () => {
+  const { todayBriefing, briefings, sendBriefing } = useAppContext();
+  const historyBriefings = useMemo(() => briefings.slice(1), [briefings]);
 
   const handleSend = (id: string) => {
     sendBriefing(id);
@@ -58,7 +62,7 @@ const BriefingPage: React.FC = () => {
             <View className={styles.eventList}>
               {todayBriefing.events.slice(0, 5).map(e => (
                 <View key={e.id} className={styles.eventItem}>
-                  <View className={classnames(styles.eventDot, styles[`dot${e.level.charAt(0).toUpperCase() + e.level.slice(1)}`]} />
+                  <View className={classnames(styles.eventDot, styles[levelClassMap[e.level]])} />
                   <Text className={styles.eventText}>{e.title}</Text>
                 </View>
               ))}
