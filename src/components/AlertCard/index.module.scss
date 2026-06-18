@@ -43,7 +43,7 @@
   display: flex;
   align-items: center;
   gap: $spacing-md;
-  margin-bottom: $spacing-md;
+  margin-bottom: $spacing-sm;
   font-size: $font-size-sm;
   color: $color-text-tertiary;
   flex-wrap: wrap;
@@ -53,6 +53,38 @@
   display: flex;
   align-items: center;
   gap: $spacing-xs;
+}
+
+.ownerRow {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+  flex-wrap: wrap;
+}
+
+.ownerTag {
+  display: inline-flex;
+  align-items: center;
+  height: 44rpx;
+  padding: 0 16rpx;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  gap: $spacing-xs;
+}
+
+.locationTag {
+  background: rgba(30, 58, 138, 0.06);
+  color: $color-primary;
+}
+
+.deptTag {
+  background: rgba(22, 163, 74, 0.08);
+  color: $color-success;
+}
+
+.ownerEmpty {
+  background: rgba(148, 163, 184, 0.12);
+  color: $color-text-tertiary;
 }
 
 .trigger {

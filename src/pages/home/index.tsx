@@ -5,51 +5,36 @@ import classnames from 'classnames';
 import { useAppContext } from '@/store/app-context';
 import AlertCard from '@/components/AlertCard';
 import SectionHeader from '@/components/SectionHeader';
-import { AlertEvent, AlertLevel } from '@/types';
+import { AlertEvent } from '@/types';
 import styles from './index.module.scss';
 
-const suggestionText = {
+const suggestionText: Record<'verify' | 'respond' | 'report', string> = {
   verify: '先核实',
   respond: '需回应',
   report: '建议上报'
 };
 
-const simAlerts = [
-  {
-    title: '突发：监管总局发布行业新规征求意见稿',
-    level: 'danger' as AlertLevel,
-    trigger: '15分钟内相关讨论量激增520%，负面情绪占比72%，超过高危阈值',
-    suggestion: 'report' as const,
-    alertId: 'a_sim_1'
-  },
-  {
-    title: '属地政策：华东项目地环保标准拟上调',
-    level: 'warning' as AlertLevel,
-    trigger: '当地论坛1小时内新增38条环保投诉帖，舆情热度快速上升',
-    suggestion: 'verify' as const,
-    alertId: 'a_sim_2'
-  },
-  {
-    title: '高管关联：CEO公开演讲被财经媒体重点报道',
-    level: 'danger' as AlertLevel,
-    trigger: '高管相关话题负面评论占比上升至65%，建议快速回应',
-    suggestion: 'respond' as const,
-    alertId: 'a_sim_3'
-  }
-];
+const pad = (n: number) => String(n).padStart(2, '0');
+const nowStr = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+const todayKey = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+};
 
 const HomePage: React.FC = () => {
-  const { alerts } = useAppContext();
+  const { alerts, pickPushEvent } = useAppContext();
   const [pushVisible, setPushVisible] = useState(false);
-  const [currentPush, setCurrentPush] = useState(simAlerts[0]);
-  const simIndex = useRef(0);
+  const [currentPush, setCurrentPush] = useState<AlertEvent | null>(null);
+  const [nowDisplay, setNowDisplay] = useState(nowStr());
   const autoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const clockTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const todayAlerts = useMemo(() => {
-    const today = '2026-06-19';
-    return alerts.filter(a => a.createdAt.startsWith(today));
-  }, [alerts]);
+  const todayK = useMemo(() => todayKey(), []);
+  const todayAlerts = useMemo(() => alerts.filter(a => a.createdAt.startsWith(todayK)), [alerts, todayK]);
 
   const dangerCount = todayAlerts.filter(a => a.level === 'danger').length;
   const warningCount = todayAlerts.filter(a => a.level === 'warning').length;
@@ -58,27 +43,25 @@ const HomePage: React.FC = () => {
 
   const urgentAlert = todayAlerts.find(a => a.level === 'danger');
 
-  const triggerPush = (useNext = true) => {
+  const triggerPush = () => {
     if (dismissTimer.current) clearTimeout(dismissTimer.current);
-    if (useNext) {
-      simIndex.current = (simIndex.current + 1) % simAlerts.length;
-      setCurrentPush(simAlerts[simIndex.current]);
+    const picked = pickPushEvent();
+    if (picked) {
+      setCurrentPush(picked);
+      setPushVisible(true);
+      dismissTimer.current = setTimeout(() => setPushVisible(false), 7000);
+      console.log('[HomePage] dynamic push triggered', { id: picked.id, title: picked.title });
+    } else {
+      Taro.showToast({ title: '暂无新的预警事件', icon: 'none' });
+      console.log('[HomePage] no push candidates');
     }
-    setPushVisible(true);
-    Taro.vibrateShort({ type: 'heavy' }).catch(() => {});
-    dismissTimer.current = setTimeout(() => {
-      setPushVisible(false);
-    }, 6000);
-    console.log('[HomePage] push notification triggered', { currentPush: simAlerts[simIndex.current] });
   };
 
   const handlePushClick = () => {
     setPushVisible(false);
-    const realAlert = urgentAlert || todayAlerts[0];
-    if (realAlert) {
-      Taro.navigateTo({
-        url: `/pages/event-detail/index?id=${realAlert.id}`
-      });
+    if (dismissTimer.current) clearTimeout(dismissTimer.current);
+    if (currentPush) {
+      Taro.navigateTo({ url: `/pages/event-detail/index?id=${currentPush.id}` });
     }
   };
 
@@ -88,76 +71,69 @@ const HomePage: React.FC = () => {
   };
 
   const handleUrgentClick = (alert: AlertEvent) => {
-    Taro.navigateTo({
-      url: `/pages/event-detail/index?id=${alert.id}`
-    });
+    Taro.navigateTo({ url: `/pages/event-detail/index?id=${alert.id}` });
   };
 
-  const goToEvents = () => {
-    Taro.switchTab({ url: '/pages/events/index' });
-  };
-
-  const goToMaterials = () => {
-    Taro.navigateTo({ url: '/pages/materials/index' });
-  };
-
-  const goToSubscribe = () => {
-    Taro.switchTab({ url: '/pages/subscribe/index' });
-  };
+  const goToEvents = () => Taro.switchTab({ url: '/pages/events/index' });
+  const goToMaterials = () => Taro.navigateTo({ url: '/pages/materials/index' });
+  const goToSubscribe = () => Taro.switchTab({ url: '/pages/subscribe/index' });
 
   useDidShow(() => {
     console.log('[HomePage] page show');
+    setNowDisplay(nowStr());
     if (autoTimer.current) clearTimeout(autoTimer.current);
-    autoTimer.current = setTimeout(() => {
-      triggerPush(false);
-    }, 2500);
+    autoTimer.current = setTimeout(triggerPush, 2500);
   });
 
   useEffect(() => {
+    clockTimer.current = setInterval(() => setNowDisplay(nowStr()), 30000);
     return () => {
       if (autoTimer.current) clearTimeout(autoTimer.current);
       if (dismissTimer.current) clearTimeout(dismissTimer.current);
+      if (clockTimer.current) clearInterval(clockTimer.current);
     };
   }, []);
 
   return (
     <ScrollView scrollY className={styles.page}>
-      <View className={classnames(styles.pushNotify, pushVisible && styles.pushShow)}>
-        <View className={styles.pushCard} onClick={handlePushClick}>
-          <View className={styles.pushHeader}>
-            <View className={styles.pushAppName}>
-              <View className={styles.pushIcon}><Text>政</Text></View>
-              <Text>政务预警</Text>
+      {currentPush && (
+        <View className={classnames(styles.pushNotify, pushVisible && styles.pushShow)}>
+          <View className={styles.pushCard} onClick={handlePushClick}>
+            <View className={styles.pushHeader}>
+              <View className={styles.pushAppName}>
+                <View className={styles.pushIcon}><Text>政</Text></View>
+                <Text>政务预警</Text>
+              </View>
+              <Text className={styles.pushTime}>刚刚</Text>
             </View>
-            <Text className={styles.pushTime}>刚刚</Text>
-          </View>
-          <View className={classnames(styles.pushLevel, currentPush.level === 'danger' ? styles.pushLevelDanger : styles.pushLevelWarning)}>
-            <Text>{currentPush.level === 'danger' ? '高危预警' : '警示提醒'}</Text>
-          </View>
-          <Text className={styles.pushTitle}>{currentPush.title}</Text>
-          <Text className={styles.pushTrigger}>触发原因：{currentPush.trigger}</Text>
-          <View className={styles.pushFooter}>
-            <View className={styles.pushSuggestion}>
-              <Text>建议：{suggestionText[currentPush.suggestion]}</Text>
+            <View className={classnames(styles.pushLevel, currentPush.level === 'danger' ? styles.pushLevelDanger : styles.pushLevelWarning)}>
+              <Text>{currentPush.level === 'danger' ? '高危预警' : '警示提醒'}</Text>
             </View>
-            <View className={styles.pushAction}>
-              <Text>查看详情</Text>
-              <Text>›</Text>
+            <Text className={styles.pushTitle}>{currentPush.title}</Text>
+            <Text className={styles.pushTrigger}>触发原因：{currentPush.triggerReason}</Text>
+            <View className={styles.pushFooter}>
+              <View className={styles.pushSuggestion}>
+                <Text>建议：{suggestionText[currentPush.suggestion]}</Text>
+              </View>
+              <View className={styles.pushAction}>
+                <Text>查看详情</Text>
+                <Text>›</Text>
+              </View>
             </View>
-          </View>
-          <View className={styles.pushDismiss} onClick={(e) => { e.stopPropagation(); dismissPush(); }}>
-            <Text>×</Text>
+            <View className={styles.pushDismiss} onClick={(e) => { e.stopPropagation(); dismissPush(); }}>
+              <Text>×</Text>
+            </View>
           </View>
         </View>
-      </View>
+      )}
 
       <View className={styles.header}>
         <Text className={styles.greeting}>下午好，值班同事</Text>
-        <Text className={styles.subtitle}>当前时间 2026-06-19 14:30</Text>
+        <Text className={styles.subtitle}>当前时间 {nowDisplay}</Text>
         <View className={styles.dutyInfo}>
           <Text className={styles.dutyLabel}>今日值班：</Text>
           <Text className={styles.dutyName}>张主任 · 公共事务部</Text>
-          <Button className={styles.simulateBtn} onClick={() => triggerPush(true)}>
+          <Button className={styles.simulateBtn} onClick={triggerPush}>
             <Text>🔔</Text>
             <Text>模拟推送</Text>
           </Button>
@@ -204,9 +180,7 @@ const HomePage: React.FC = () => {
             <SectionHeader title="紧急预警" />
             <View className={styles.urgentCard} onClick={() => handleUrgentClick(urgentAlert)}>
               <View className={styles.urgentHeader}>
-                <View className={styles.urgentLabel}>
-                  <Text>紧急</Text>
-                </View>
+                <View className={styles.urgentLabel}><Text>紧急</Text></View>
                 <Text className={styles.urgentTime}>{urgentAlert.createdAt.slice(11, 16)}</Text>
               </View>
               <Text className={styles.urgentTitle}>{urgentAlert.title}</Text>
@@ -225,9 +199,14 @@ const HomePage: React.FC = () => {
           title="今日预警"
           extra={<Text onClick={goToEvents} style={{ color: '#1E3A8A' }}>查看全部 ›</Text>}
         />
-        {todayAlerts.map(alert => (
-          <AlertCard key={alert.id} alert={alert} />
-        ))}
+        {todayAlerts.length > 0 ? (
+          todayAlerts.map(alert => <AlertCard key={alert.id} alert={alert} />)
+        ) : (
+          <View style={{ padding: '80rpx 0', textAlign: 'center' }}>
+            <Text style={{ fontSize: '56rpx', color: '#CBD5E1' }}>✓</Text>
+            <Text style={{ display: 'block', marginTop: '16rpx', fontSize: '26rpx', color: '#94A3B8' }}>今日暂无预警事件</Text>
+          </View>
+        )}
       </View>
     </ScrollView>
   );

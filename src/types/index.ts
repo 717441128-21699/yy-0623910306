@@ -46,6 +46,14 @@ export interface WordPackage {
   subscribedAt?: string;
 }
 
+export type BriefingTarget = 'legal' | 'brand' | 'pr';
+
+export interface BriefingSendStatus {
+  legal: boolean;
+  brand: boolean;
+  pr: boolean;
+}
+
 export interface Briefing {
   id: string;
   date: string;
@@ -58,6 +66,7 @@ export interface Briefing {
   events: AlertEvent[];
   generatedAt: string;
   isSent: boolean;
+  sendStatus: BriefingSendStatus;
 }
 
 export interface AppState {

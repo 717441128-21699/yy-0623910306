@@ -80,6 +80,79 @@
 .infoColor { color: #93C5FD; }
 .resolvedColor { color: #86EFAC; }
 
+.targetStatus {
+  margin: 0 $page-padding $spacing-md;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.targetTitle {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+}
+
+.targetRow {
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.targetItem {
+  flex: 1;
+  text-align: center;
+  padding: $spacing-md 0;
+  border-radius: $radius-md;
+  background: $color-bg-page;
+  border: 2rpx solid $color-border;
+  transition: all $transition-base;
+}
+
+.targetDone {
+  background: $color-success-light;
+  border-color: transparent;
+}
+
+.targetIcon {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: $radius-round;
+  background: rgba(148, 163, 184, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  margin: 0 auto $spacing-xs;
+}
+
+.targetDone .targetIcon {
+  background: $color-success;
+  color: $color-text-white;
+}
+
+.targetName {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  font-weight: $font-weight-medium;
+  margin-bottom: 4rpx;
+}
+
+.targetDone .targetName {
+  color: $color-success;
+}
+
+.targetState {
+  font-size: 20rpx;
+  color: $color-text-tertiary;
+}
+
+.targetDone .targetState {
+  color: $color-success;
+  font-weight: $font-weight-medium;
+}
+
 .sendBar {
   position: fixed;
   left: 0;
@@ -91,16 +164,17 @@
   box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.06);
   display: flex;
   gap: $spacing-sm;
+  flex-wrap: wrap;
 }
 
 .previewBtn {
   @include button-reset;
-  flex: 1;
-  height: $button-height-lg;
+  width: 100%;
+  height: 72rpx;
   border-radius: $radius-button;
   background: $color-bg-page;
   color: $color-text-secondary;
-  font-size: $font-size-md;
+  font-size: $font-size-sm;
   font-weight: $font-weight-medium;
 
   &:active {
@@ -108,9 +182,31 @@
   }
 }
 
-.sendBtn {
+.singleSendBtn {
   @include button-reset;
-  flex: 2;
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: $color-bg-page;
+  border: 2rpx solid $color-primary-light;
+  color: $color-primary;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+
+  &:active {
+    opacity: 0.85;
+  }
+}
+
+.singleDone {
+  background: $color-success-light;
+  border-color: transparent;
+  color: $color-success;
+}
+
+.sendAllBtn {
+  @include button-reset;
+  width: 100%;
   height: $button-height-lg;
   border-radius: $radius-button;
   background: $color-primary;
@@ -123,15 +219,8 @@
   }
 }
 
-.sentBtn {
-  @include button-reset;
-  flex: 2;
-  height: $button-height-lg;
-  border-radius: $radius-button;
+.allDone {
   background: $color-success;
-  color: $color-text-white;
-  font-size: $font-size-md;
-  font-weight: $font-weight-semibold;
 }
 
 .historySection {

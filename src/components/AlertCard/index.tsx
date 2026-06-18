@@ -52,13 +52,17 @@ const AlertCard: React.FC<AlertCardProps> = ({ alert }) => {
         <View className={styles.metaItem}>
           <Text>负面占比 {alert.negativeRatio}%</Text>
         </View>
-        {alert.location && (
-          <View className={styles.metaItem}>
-            <Text>{alert.location}</Text>
-          </View>
-        )}
         <View className={styles.metaItem}>
           <Text>{alert.createdAt.slice(5, 16)}</Text>
+        </View>
+      </View>
+
+      <View className={styles.ownerRow}>
+        <View className={classnames(styles.ownerTag, styles.locationTag, !alert.location && styles.ownerEmpty)}>
+          <Text>📍 {alert.location || '待标记属地'}</Text>
+        </View>
+        <View className={classnames(styles.ownerTag, styles.deptTag, !alert.department && styles.ownerEmpty)}>
+          <Text>🏢 {alert.department || '待分配部门'}</Text>
         </View>
       </View>
 
