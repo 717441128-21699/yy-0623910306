@@ -173,6 +173,23 @@ const HistoryCard: React.FC<{ briefing: Briefing }> = ({ briefing }) => {
           <Text>已处理</Text>
         </View>
       </View>
+      <View className={styles.historyTargets}>
+        <View className={styles.historyTargetRow}>
+          {allTargets.map(t => {
+            const meta = targetMeta[t];
+            const done = send[t];
+            return (
+              <View
+                key={t}
+                className={classnames(styles.historyTargetItem, done && styles.historyTargetDone)}
+              >
+                <Text className={styles.historyTargetIcon}>{done ? '✓' : meta.icon}</Text>
+                <Text>{meta.name}</Text>
+              </View>
+            );
+          })}
+        </View>
+      </View>
     </View>
   );
 };

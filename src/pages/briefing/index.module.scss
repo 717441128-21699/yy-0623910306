@@ -333,3 +333,39 @@
   line-height: $line-height-normal;
   @include text-ellipsis-multi(2);
 }
+
+.historyTargets {
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1rpx dashed $color-border;
+}
+
+.historyTargetRow {
+  display: flex;
+  gap: $spacing-xs;
+}
+
+.historyTargetItem {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6rpx;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-sm;
+  background: $color-bg-page;
+  font-size: 20rpx;
+  color: $color-text-tertiary;
+  border: 1rpx solid $color-border;
+}
+
+.historyTargetDone {
+  background: $color-success-light;
+  color: $color-success;
+  font-weight: $font-weight-medium;
+  border-color: transparent;
+}
+
+.historyTargetIcon {
+  font-size: 20rpx;
+}

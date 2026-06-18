@@ -22,6 +22,15 @@ interface AppContextType extends AppState {
 
 const AppContext = createContext<AppContextType | null>(null);
 
+const EMPTY_SEND: BriefingSendStatus = { legal: false, brand: false, pr: false };
+const ALL_SEND: BriefingSendStatus = { legal: true, brand: true, pr: true };
+
+const normalizeBriefing = (b: Briefing): Briefing => {
+  if (b.sendStatus) return b;
+  const sendStatus: BriefingSendStatus = b.isSent ? { ...ALL_SEND } : { ...EMPTY_SEND };
+  return { ...b, sendStatus };
+};
+
 const pad = (n: number) => String(n).padStart(2, '0');
 const formatDate = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 const formatFull = (d: Date) => `${formatDate(d)} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
@@ -250,8 +259,6 @@ const buildAlerts = (): AlertEvent[] => [
   }
 ];
 
-const EMPTY_SEND: BriefingSendStatus = { legal: false, brand: false, pr: false };
-
 const buildHistoryBriefing = (dateStr: string, events: AlertEvent[], sendStatus: BriefingSendStatus): Briefing => {
   const isSent = sendStatus.legal && sendStatus.brand && sendStatus.pr;
   const [y, m, d] = dateStr.split('-');
@@ -326,7 +333,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const todayBriefing = useMemo<Briefing>(() => {
     const todayAlerts = alerts.filter(a => a.createdAt.startsWith(todayStr));
     const isSent = todaySendStatus.legal && todaySendStatus.brand && todaySendStatus.pr;
-    return {
+    return normalizeBriefing({
       id: 'b_today',
       date: todayStr,
       title: `${formatCN(TODAY)}政务风险值班简报`,
@@ -339,13 +346,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       generatedAt: `${todayStr} 18:00:00`,
       isSent,
       sendStatus: todaySendStatus
-    };
+    });
   }, [alerts, todaySendStatus]);
 
   const historyBriefings = useMemo<Briefing[]>(() => {
     return [yesterdayStr, day2Str, day3Str, day4Str].map(ds => {
       const dayEvents = initialAlerts.filter(a => a.createdAt.startsWith(ds));
-      return buildHistoryBriefing(ds, dayEvents, historySendMap[ds] || EMPTY_SEND);
+      return normalizeBriefing(buildHistoryBriefing(ds, dayEvents, historySendMap[ds] || EMPTY_SEND));
     });
   }, [historySendMap]);
 
@@ -373,9 +380,28 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   }, []);
 
   const toggleSubscription = useCallback((id: string) => {
-    setSubscriptions(prev => prev.map(s => s.id === id ? { ...s, isActive: !s.isActive } : s));
+    setSubscriptions(prev => {
+      const target = prev.find(s => s.id === id);
+      const wasActive = target?.isActive ?? false;
+      const next = prev.map(s => s.id === id ? { ...s, isActive: !s.isActive } : s);
+      if (target && !wasActive) {
+        setPushedIds(prevPushed => {
+          const newSet = new Set(prevPushed);
+          const categoryIds = new Set(
+            alerts.filter(a => a.category === target.category).map(a => a.id)
+          );
+          categoryIds.forEach(cid => newSet.delete(cid));
+          console.log('[AppContext] toggleSubscription re-opened category, cleared pushedIds for category', {
+            category: target.category,
+            clearedCount: categoryIds.size
+          });
+          return newSet;
+        });
+      }
+      return next;
+    });
     console.log('[AppContext] toggleSubscription', { id });
-  }, []);
+  }, [alerts]);
 
   const updateThreshold = useCallback((id: string, threshold: number) => {
     setSubscriptions(prev => prev.map(s => s.id === id ? { ...s, threshold } : s));
@@ -391,9 +417,14 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         subscribedAt: formatFull(new Date())
       };
       setSubscriptions(prev => [...prev, newPkg]);
+      setPushedIds(prevPushed => {
+        const newSet = new Set(prevPushed);
+        alerts.filter(a => a.category === pkg.category).forEach(a => newSet.delete(a.id));
+        return newSet;
+      });
       console.log('[AppContext] subscribePackage', { id, newPkg });
     }
-  }, [subscriptions]);
+  }, [subscriptions, alerts]);
 
   const sendBriefingToTarget = useCallback((id: string, target: BriefingTarget) => {
     if (id === 'b_today') {
