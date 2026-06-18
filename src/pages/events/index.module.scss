@@ -1,0 +1,157 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 40rpx;
+}
+
+.statusTabs {
+  display: flex;
+  background: $color-bg-card;
+  padding: $spacing-md $page-padding 0;
+  box-shadow: $shadow-card;
+}
+
+.tabItem {
+  flex: 1;
+  padding: $spacing-md 0;
+  text-align: center;
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  position: relative;
+  transition: all $transition-base;
+}
+
+.tabActive {
+  color: $color-primary;
+  font-weight: $font-weight-semibold;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 64rpx;
+    height: 6rpx;
+    background: $color-primary;
+    border-radius: 3rpx;
+  }
+}
+
+.levelFilter {
+  display: flex;
+  gap: $spacing-sm;
+  padding: $spacing-md $page-padding;
+  flex-wrap: wrap;
+}
+
+.levelChip {
+  height: 56rpx;
+  padding: 0 $spacing-md;
+  border-radius: $radius-round;
+  background: $color-bg-card;
+  border: 1rpx solid $color-border;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  transition: all $transition-base;
+}
+
+.chipActive {
+  border-color: $color-primary;
+  background: rgba(30, 58, 138, 0.06);
+  color: $color-primary;
+  font-weight: $font-weight-medium;
+}
+
+.chipDanger {
+  &.chipActive {
+    border-color: $color-danger;
+    background: $color-danger-light;
+    color: $color-danger;
+  }
+}
+
+.chipWarning {
+  &.chipActive {
+    border-color: $color-warning;
+    background: $color-warning-light;
+    color: $color-warning;
+  }
+}
+
+.chipInfo {
+  &.chipActive {
+    border-color: $color-info;
+    background: $color-info-light;
+    color: $color-info;
+  }
+}
+
+.content {
+  padding: 0 $page-padding;
+}
+
+.empty {
+  padding: 120rpx 0;
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 80rpx;
+  color: $color-text-disabled;
+  margin-bottom: $spacing-md;
+}
+
+.emptyText {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md $page-padding 0;
+}
+
+.searchBox {
+  flex: 1;
+  height: 64rpx;
+  background: $color-bg-card;
+  border-radius: $radius-button;
+  padding: 0 $spacing-md;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  margin-right: $spacing-sm;
+  border: 1rpx solid $color-border;
+}
+
+.searchIcon {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}
+
+.searchInput {
+  flex: 1;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+}
+
+.entrance {
+  height: 64rpx;
+  padding: 0 $spacing-md;
+  border-radius: $radius-button;
+  background: $color-bg-card;
+  border: 1rpx solid $color-border;
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}

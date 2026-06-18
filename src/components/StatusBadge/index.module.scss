@@ -1,0 +1,39 @@
+@use '@/styles/variables.scss' as *;
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  height: 44rpx;
+  padding: 0 20rpx;
+  border-radius: $radius-round;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+  background: $color-bg-hover;
+  color: $color-text-secondary;
+}
+
+.pending {
+  background: $color-danger-light;
+  color: $color-danger;
+}
+
+.verifying {
+  background: $color-warning-light;
+  color: $color-warning;
+}
+
+.responding {
+  background: $color-info-light;
+  color: $color-info;
+}
+
+.reported {
+  background: rgba(30, 58, 138, 0.1);
+  color: $color-primary;
+}
+
+.resolved {
+  background: $color-success-light;
+  color: $color-success;
+}

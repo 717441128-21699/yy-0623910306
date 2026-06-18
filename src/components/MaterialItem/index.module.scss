@@ -1,0 +1,68 @@
+@use '@/styles/variables.scss' as *;
+
+.item {
+  background: $color-bg-card;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-bottom: $spacing-sm;
+  border: 1rpx solid $color-border;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-sm;
+}
+
+.typeTag {
+  display: inline-flex;
+  align-items: center;
+  height: 36rpx;
+  padding: 0 12rpx;
+  border-radius: $radius-xs;
+  font-size: 20rpx;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.comment {
+  background: rgba(134, 144, 156, 0.15);
+  color: $color-text-secondary;
+}
+
+.media {
+  background: rgba(59, 130, 246, 0.12);
+  color: $color-info;
+}
+
+.official {
+  background: rgba(22, 163, 74, 0.12);
+  color: $color-success;
+}
+
+.time {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.title {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+  @include text-ellipsis-multi(2);
+}
+
+.source {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-sm;
+}
+
+.content {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+  @include text-ellipsis-multi(3);
+}

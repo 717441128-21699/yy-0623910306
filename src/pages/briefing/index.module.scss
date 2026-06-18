@@ -1,0 +1,246 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 200rpx;
+}
+
+.todayCard {
+  margin: $spacing-md $page-padding;
+  background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
+  border-radius: $radius-xl;
+  padding: $spacing-xl;
+  color: $color-text-white;
+  box-shadow: 0 8rpx 32rpx rgba(30, 58, 138, 0.25);
+}
+
+.todayHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-lg;
+}
+
+.todayLabel {
+  font-size: $font-size-sm;
+  opacity: 0.8;
+}
+
+.todayStatus {
+  display: inline-flex;
+  align-items: center;
+  height: 44rpx;
+  padding: 0 20rpx;
+  border-radius: $radius-round;
+  background: rgba(255, 255, 255, 0.2);
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+.todayTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  margin-bottom: $spacing-md;
+  line-height: $line-height-tight;
+}
+
+.todaySummary {
+  font-size: $font-size-sm;
+  opacity: 0.9;
+  line-height: $line-height-normal;
+  margin-bottom: $spacing-lg;
+}
+
+.todayStats {
+  display: flex;
+  gap: $spacing-md;
+  padding-top: $spacing-lg;
+  border-top: 1rpx solid rgba(255, 255, 255, 0.15);
+}
+
+.statItem {
+  flex: 1;
+  text-align: center;
+}
+
+.statNum {
+  font-size: 40rpx;
+  font-weight: $font-weight-bold;
+  margin-bottom: $spacing-xs;
+}
+
+.statLabel {
+  font-size: $font-size-xs;
+  opacity: 0.75;
+}
+
+.dangerColor { color: #FCA5A5; }
+.warningColor { color: #FCD34D; }
+.infoColor { color: #93C5FD; }
+.resolvedColor { color: #86EFAC; }
+
+.sendBar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: $color-bg-card;
+  padding: $spacing-md $page-padding;
+  padding-bottom: calc(#{$spacing-md} + env(safe-area-inset-bottom));
+  box-shadow: 0 -4rpx 16rpx rgba(0, 0, 0, 0.06);
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.previewBtn {
+  @include button-reset;
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: $color-bg-page;
+  color: $color-text-secondary;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.sendBtn {
+  @include button-reset;
+  flex: 2;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: $color-primary;
+  color: $color-text-white;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.sentBtn {
+  @include button-reset;
+  flex: 2;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  background: $color-success;
+  color: $color-text-white;
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+}
+
+.historySection {
+  padding: 0 $page-padding;
+}
+
+.historyCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+
+  &:active {
+    background: $color-bg-hover;
+  }
+}
+
+.historyHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-sm;
+}
+
+.historyDate {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.historyTag {
+  display: inline-flex;
+  align-items: center;
+  height: 40rpx;
+  padding: 0 16rpx;
+  border-radius: $radius-round;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+}
+
+.sent {
+  background: $color-success-light;
+  color: $color-success;
+}
+
+.unsent {
+  background: rgba(134, 144, 156, 0.15);
+  color: $color-text-secondary;
+}
+
+.historySummary {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+  margin-bottom: $spacing-md;
+}
+
+.historyStats {
+  display: flex;
+  gap: $spacing-lg;
+  flex-wrap: wrap;
+}
+
+.historyStat {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.histNum {
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.eventList {
+  margin-top: $spacing-md;
+}
+
+.eventItem {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-sm;
+  padding: $spacing-sm 0;
+  border-bottom: 1rpx solid $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.eventDot {
+  flex-shrink: 0;
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  margin-top: 16rpx;
+}
+
+.dotDanger { background: $color-danger; }
+.dotWarning { background: $color-warning; }
+.dotInfo { background: $color-info; }
+
+.eventText {
+  flex: 1;
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  line-height: $line-height-normal;
+  @include text-ellipsis-multi(2);
+}
